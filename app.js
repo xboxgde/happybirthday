@@ -45,12 +45,12 @@ $('btnNo').onclick  = () => show('notbday');
 // 본인 확인 화면
 function goConfirm(person){
   found = person;
-  $('confirmTitle').textContent = person.name + '님이 맞나요?';
+  $('confirmTitle').textContent = person.name + ' 이거 너 맞음?';
   show('confirm');
 }
 // [수정] 선물상자 화면 열기를 함수로 분리 (질문이 끝난 뒤에도 호출하기 위함)
 function openBox(){
-  $('boxTitle').textContent = found.name + '님, 생일 축하해요! 🎉';
+  $('boxTitle').textContent = found.name + ' 생축생축 짝짝짝';
   $('giftBox').classList.remove('open');
   show('box');
 }
@@ -72,8 +72,8 @@ $('btnCheck').onclick = async () => {
     // [수정] 안내 후 자동 복귀 → 개발자에게 알릴 수 있는 화면으로 이동 (처음으로 돌아가는 버튼 포함)
     if(!data.length){
       const m = $('selMonth').value, d = $('selDay').value;
-      showReport('no_birthday', '등록된 생일이 없어요',
-        m + '월 ' + d + '일 생일이 등록되어 있지 않아요. 개발자에게 알려드릴까요?',
+      showReport('no_birthday', '개발자가 너 등록 안한듯',
+        m + '월 ' + d + '생일 입력하면 개발자한테 알려드림',
         '[생일 없음] ' + m + '월 ' + d + '일 입력');
       return;
     }
@@ -108,11 +108,11 @@ $('giftBox').onclick = async () => {
     if(res.error) throw res.error;
     const row = res.data && res.data[0];
 
-    $('giftTitle').textContent = found.name + '님을 위한 선물';
+    $('giftTitle').textContent = found.name + ' 너만을 위한 선물~';
     // [수정] 선물이 없으면 안내만 하지 않고 개발자에게 알릴 수 있는 화면으로 이동
     if(!(row && row.image_path)){
-      showReport('no_gift', '선물이 아직 준비되지 않았어요',
-        found.name + '님의 선물이 아직 없어요. 개발자에게 알려드릴까요?',
+      showReport('no_gift', '개발자가 선물 안넣음',
+        found.name + '원하는거 있으면 적어서 보내셈',
         '[선물 없음] ' + found.name + '님');
       return;
     }
@@ -121,7 +121,7 @@ $('giftBox').onclick = async () => {
     show('gift');
   }catch(e){
     $('giftBox').classList.remove('open');
-    alert('선물을 불러오지 못했어요. 다시 눌러주세요.');
+    alert('오류남. 다시해라');
   }
 };
 
@@ -431,9 +431,9 @@ $('btnRpSend').onclick = async () => {
   try{
     const { error } = await sb.rpc('send_dev_message', { p_kind: report.kind, p_body: body });
     if(error) throw error;
-    $('rpMsg').textContent = '개발자에게 전달했어요. 고마워요!';   // 성공 후 버튼은 잠근 채로 둠
+    $('rpMsg').textContent = '보냈음. 기다리셈';   // 성공 후 버튼은 잠근 채로 둠
   }catch(e){
-    $('rpMsg').textContent = '전달하지 못했어요. 잠시 후 다시 시도해 주세요.';
+    $('rpMsg').textContent = '오류남. 다시해라';
     btn.disabled = false;
   }
 };
