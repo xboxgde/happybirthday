@@ -22,17 +22,16 @@
 
   <!-- [1] 첫 화면: 생일인지 아닌지 선택 -->
   <section class="view on" id="v-home">
-    <h1>오늘, 생일이세요?</h1>
-    <p>생일이라면 준비된 선물이 기다리고 있어요.</p>
+    <h1>생일인가용</h1>
     <div class="row">
-      <button class="btn" id="btnYes">네, 생일이에요</button>
-      <button class="btn mint" id="btnNo">아니요</button>
+      <button class="btn" id="btnYes">생일인데용</button>
+      <button class="btn mint" id="btnNo">생일아닌데용</button>
     </div>
   </section>
 
   <!-- [2] 생일 입력 화면 -->
   <section class="view" id="v-input">
-    <h2>생일을 알려주세요</h2>
+    <h2>생일이 언제인뎁숑</h2>
     <div class="panel">
       <label>월 / 일</label>
       <div class="inline">
@@ -40,15 +39,15 @@
         <select id="selDay" aria-label="일"></select>
       </div>
       <p class="msg" id="inputMsg" role="alert"></p>
-      <div class="row"><button class="btn" id="btnCheck">선물 확인하기</button>
+      <div class="row"><button class="btn" id="btnCheck">생일 확인하기</button>
       <button class="btn sub" data-go="home">처음으로</button></div>
     </div>
   </section>
 
   <!-- [3] 생일이 아닐 때 화면 -->
   <section class="view" id="v-notbday">
-    <h1>생일이 아니군요!</h1>
-    <p>생일이 되면 다시 놀러 와 주세요.</p>
+    <h1>생일이 아니잖아.</h1>
+    <p>생일이 되면 다시와라.</p>
     <!-- [추가] 개발자가 등록한 사진 (등록 전에는 숨김) -->
     <img class="gift" id="notbdayImg" alt="" style="display:none;margin-top:18px">
     <div class="row"><button class="btn" data-go="home">처음으로</button></div>
@@ -56,8 +55,8 @@
 
   <!-- [수정] 동일 생일자가 2명 이상일 때 본인을 고르는 화면 추가 -->
   <section class="view" id="v-pick">
-    <h2>같은 생일인 분이 여러 명이에요</h2>
-    <p>본인 이름을 눌러주세요.</p>
+    <h2>똑같은 생일이 여러명이군.</h2>
+    <p>다른사람 고르면 집까지 찾아감.</p>
     <div class="pickList" id="pickList"></div>
     <div class="row"><button class="btn sub" data-go="input">다시 입력</button></div>
   </section>
@@ -65,7 +64,7 @@
   <!-- [4] 선물상자 화면 -->
   <section class="view" id="v-box">
     <h2 id="boxTitle"></h2>
-    <p>선물상자를 눌러보세요.</p>
+    <p>쨘</p>
     <button class="box" id="giftBox" aria-label="선물상자 열기">
       <span class="body"></span><span class="rib"></span><span class="lid"></span>
     </button>
