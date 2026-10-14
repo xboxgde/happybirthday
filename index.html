@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <!-- [수정] <style> 블록 삭제 → style.css 파일로 분리 -->
 <!-- [수정] ?v=3 추가: 브라우저가 예전 style.css를 재사용하지 않도록 (파일 수정 때마다 숫자를 올리면 됨) -->
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -49,6 +49,8 @@
   <section class="view" id="v-notbday">
     <h1>생일이 아니군요!</h1>
     <p>생일이 되면 다시 놀러 와 주세요.</p>
+    <!-- [추가] 개발자가 등록한 사진 (등록 전에는 숨김) -->
+    <img class="gift" id="notbdayImg" alt="" style="display:none;margin-top:18px">
     <div class="row"><button class="btn" data-go="home">처음으로</button></div>
   </section>
 
@@ -74,6 +76,16 @@
     <h2 id="giftTitle"></h2>
     <img class="gift" id="giftImg" alt="생일 선물">
     <div class="row"><button class="btn" data-go="home">처음으로</button></div>
+  </section>
+
+  <!-- [추가] 예/아니오 질문 화면 (공통 틀 1개): 문구와 이동 경로는 app.js의 QUESTIONS에서 설정 -->
+  <section class="view" id="v-yesno">
+    <h1 id="qText"></h1>
+    <p id="qSub"></p>
+    <div class="row">
+      <button class="btn" id="qYes"></button>
+      <button class="btn mint" id="qNo"></button>
+    </div>
   </section>
 
   <!-- [6] 개발자 로그인 -->
@@ -125,6 +137,17 @@
     </div>
     <h2>선물 등록 현황</h2>
     <div class="panel" id="giftList"></div>
+
+    <!-- [추가] "생일이 아닐 때" 화면에 보여줄 사진 등록 -->
+    <h2>"생일 아님" 화면 사진</h2>
+    <div class="panel">
+      <img class="gift" id="nbPreview" alt="" style="display:none;margin-bottom:12px">
+      <label for="nbFile">사진 선택</label>
+      <input id="nbFile" type="file" accept="image/*">
+      <p class="msg" id="nbMsg" role="alert"></p>
+      <div class="row"><button class="btn" id="btnNbSave">사진 저장</button>
+      <button class="btn sub" id="btnNbDel">사진 삭제</button></div>
+    </div>
   </section>
 
   <!-- [수정] 사용자: 본인 확인 화면 (신규, 생일 입력 후 / 선물상자 전) -->
@@ -139,6 +162,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.js"></script>
 <!-- [수정] 인라인 <script> 블록 삭제 → app.js 파일로 분리 -->
-<script src="app.js?v=3"></script>
+<script src="app.js?v=6"></script>
 </body>
 </html>

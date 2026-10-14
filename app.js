@@ -17,6 +17,7 @@ const $ = id => document.getElementById(id);
 function show(name){
   document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
   $('v-'+name).classList.add('on');
+  if(name === 'notbday') loadNotBdayImage();   // [수정] 생일 아님 화면이 열리면 사진 불러오기
 }
 document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
 
@@ -46,11 +47,14 @@ function goConfirm(person){
   $('confirmTitle').textContent = person.name + '님이 맞나요?';
   show('confirm');
 }
-$('btnConfirmYes').onclick = () => {
+// [수정] 선물상자 화면 열기를 함수로 분리 (질문이 끝난 뒤에도 호출하기 위함)
+function openBox(){
   $('boxTitle').textContent = found.name + '님, 생일 축하해요! 🎉';
   $('giftBox').classList.remove('open');
   show('box');
-};
+}
+// [수정] 맞아요 → 바로 선물상자가 아니라 질문 q1부터 시작
+$('btnConfirmYes').onclick = () => showQuestion('q1');
 $('btnConfirmNo').onclick = () => show(candidates.length > 1 ? 'pick' : 'home');
 
 // 생일 확인: 서버 함수 get_candidates 호출 (id와 이름만 돌아옴)
@@ -171,7 +175,7 @@ $('btnSave').onclick = async () => {
   renderList();
 };
 
-$('btnToGifts').onclick  = () => { renderGiftAdm(); show('giftadm'); };
+$('btnToGifts').onclick  = () => { renderGiftAdm(); renderNb(); show('giftadm'); };   // [수정] renderNb() 추가
 $('btnToPeople').onclick = () => { renderList(); show('admin'); };
 
 // 생일자 삭제: 이미지 파일 먼저 삭제 → 행 삭제 (gifts 행은 DB가 자동 삭제)
@@ -278,4 +282,123 @@ $('btnGiftSave').onclick = async () => {
   }finally{
     btn.disabled = false;
   }
+};
+
+/* ============================================================
+   [추가] 예/아니오 질문 화면
+   - 화면(HTML)은 v-yesno 하나만 쓰고, 아래 QUESTIONS 설정만 늘리면 질문이 추가됨
+   - next 값: 다른 질문의 id 또는 기존 화면 이름(home, input, notbday ...)
+   ============================================================ */
+const QUESTIONS = {
+  q1: {
+    text: '오늘 하루는 즐거웠나요?',               // 큰 제목 문구 (자유롭게 수정)
+    sub:  '솔직하게 골라주세요.',                  // 작은 안내 문구 (생략 가능)
+    yes:  { label: '네, 즐거웠어요', next: 'q2' }, // 예 버튼: 문구 + 이동할 곳
+    no:   { label: '그저 그랬어요',   next: 'q2' }  // 아니오 버튼: 문구 + 이동할 곳
+  },
+  q2: {
+    text: '케이크 먹을 준비가 됐나요?',
+    yes:  { label: '준비 완료!', next: 'q3' },
+    no:   { label: '조금만 더',   next: 'q3' }
+  },
+  q3: {
+    text: '소원은 빌었나요?',
+    sub:  '눈을 감고 마음속으로 빌어보세요.',
+    yes:  { label: '빌었어요', next: 'q4' },
+    no:   { label: '지금 빌게요', next: 'q4' }
+  },
+  q4: {
+    text: '이제 선물을 열어볼까요?',
+    yes:  { label: '열어볼래요!', next: 'box' },   // next:'box' → 선물상자 화면 (마지막 질문)
+    no:   { label: '좋아요',       next: 'box' }
+  }
+  // 질문을 더 추가하려면 q4 뒤에 쉼표(,)를 붙이고 q5: { ... } 를 이어서 작성
+  // 예/아니오를 다른 곳으로 나누려면 next 값을 서로 다르게 지정 (예: 아니오 → 'home')
+};
+
+// 질문 화면 표시: 설정의 문구를 화면에 채우고 버튼 동작을 연결
+function showQuestion(id){
+  const q = QUESTIONS[id];
+  if(!q){ show('home'); return; }                  // 없는 질문 id면 첫 화면으로 (오류 방지)
+  $('qText').textContent = q.text;
+  $('qSub').textContent  = q.sub || '';
+  $('qYes').textContent  = q.yes.label || '네';
+  $('qNo').textContent   = q.no.label  || '아니요';
+  $('qYes').onclick = () => goNext(q.yes.next);
+  $('qNo').onclick  = () => goNext(q.no.next);
+  show('yesno');
+}
+
+// 이동 규칙: 질문 id면 질문 화면, 일반 화면 이름이면 그 화면, 둘 다 아니면 첫 화면
+function goNext(next){
+  if(next === 'box'){ openBox(); return; }      // [수정] 질문이 끝나면 선물상자 (제목 설정 포함)
+  if(QUESTIONS[next]) showQuestion(next);
+  else if($('v-' + next)) show(next);
+  else show('home');
+}
+
+/* ============================================================
+   [추가] "생일 아님" 화면 사진
+   - 경로는 site_settings 테이블(key='notbday_image')에, 파일은 gifts 버킷의 notbday/ 폴더에 저장
+   ============================================================ */
+// 저장된 사진 경로 조회 (테이블이 없거나 오류면 null → 사진 없이 정상 동작)
+async function getNbPath(){
+  try{
+    const { data, error } = await sb.from('site_settings')
+      .select('value').eq('key', 'notbday_image').maybeSingle();
+    if(error) return null;
+    return data ? data.value : null;
+  }catch(e){ return null; }
+}
+
+// 사용자 화면: 사진이 있으면 표시, 없으면 숨김
+async function loadNotBdayImage(){
+  const img = $('notbdayImg');
+  img.style.display = 'none';
+  const path = await getNbPath();
+  if(path){ img.src = imgUrl(path); img.style.display = ''; }
+}
+
+// 개발자 화면: 현재 사진 미리보기 갱신
+async function renderNb(){
+  const pv = $('nbPreview');
+  const path = await getNbPath();
+  if(path){ pv.src = imgUrl(path); pv.style.display = ''; }
+  else pv.style.display = 'none';
+}
+
+// 사진 저장: 업로드 → 경로 저장 → 이전 파일 삭제 (실패 시 업로드 취소)
+$('btnNbSave').onclick = async () => {
+  const file = $('nbFile').files[0];
+  if(!file){ $('nbMsg').textContent = '사진을 선택하세요.'; return; }
+  const btn = $('btnNbSave'); btn.disabled = true;
+  try{
+    const blob = await resizeImage(file);
+    const path = 'notbday/' + crypto.randomUUID() + '.jpg';
+    let r = await sb.storage.from(BUCKET).upload(path, blob, { contentType: 'image/jpeg' });
+    if(r.error) throw r.error;
+    const old = await getNbPath();
+    r = await sb.from('site_settings').upsert(
+      { key: 'notbday_image', value: path, updated_at: new Date().toISOString() });
+    if(r.error){ await sb.storage.from(BUCKET).remove([path]); throw r.error; }
+    if(old) await sb.storage.from(BUCKET).remove([old]);
+    $('nbMsg').textContent = '저장했습니다.';
+    $('nbFile').value = '';
+    renderNb();
+  }catch(e){
+    $('nbMsg').textContent = '저장에 실패했습니다. SQL 설정과 로그인 상태를 확인하세요.';
+  }finally{
+    btn.disabled = false;
+  }
+};
+
+// 사진 삭제: 설정 행 삭제 → 파일 삭제
+$('btnNbDel').onclick = async () => {
+  const old = await getNbPath();
+  if(!old){ $('nbMsg').textContent = '삭제할 사진이 없습니다.'; return; }
+  const r = await sb.from('site_settings').delete().eq('key', 'notbday_image');
+  if(r.error){ $('nbMsg').textContent = '삭제에 실패했습니다.'; return; }
+  await sb.storage.from(BUCKET).remove([old]);
+  $('nbMsg').textContent = '삭제했습니다.';
+  renderNb();
 };
