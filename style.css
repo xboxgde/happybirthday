@@ -1,17 +1,17 @@
 /* 생일 선물 상자 - 디자인 파일 (index.html에서 불러옴) */
-/* ===== 디자인 토큰: 색상은 :root 변수로 관리 (라이트/다크 대응) ===== */
+/* ===== 디자인 토큰: 색상은 :root 변수로 관리 ===== */
+/* [수정] 밝은 팔레트로 변경 + 다크 모드 코드 삭제 (기기 설정과 관계없이 항상 밝게 표시) */
 :root{
-  --bg:#fff7ea; --ink:#2a2350; --card:#ffffff; --pink:#ff4f8b; --sun:#ffc93c; --mint:#27c9a0; --line:#e6dcc8;
+  color-scheme:light;   /* [수정] 입력창·스크롤바도 항상 밝게 */
+  --bg:#fffefa; --ink:#3d3560; --card:#ffffff; --pink:#ff4f8b; --sun:#ffd84d; --mint:#3fd9b5; --line:#f3e9d2;
   box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){ --bg:#1d1a3f; --ink:#fff4dc; --card:#2b2760; --line:#443f87; }
-}
-:root[data-theme="dark"]{ --bg:#1d1a3f; --ink:#fff4dc; --card:#2b2760; --line:#443f87; }
 
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
-body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+/* [수정] 배경: 단색 → 위쪽에 은은한 햇살 빛이 번지는 밝은 배경 */
+body{margin:0;min-height:100vh;color:var(--ink);
+     background:radial-gradient(ellipse 120% 50% at 50% 0%, #fff3c4 0%, rgba(255,243,196,0) 70%) no-repeat, var(--bg);
      font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:1.5}
 
 /* 상단 바: 오른쪽 상단에 개발자 버튼 배치 (요구사항 1.1) */
