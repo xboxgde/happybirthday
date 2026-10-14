@@ -112,7 +112,7 @@ $('giftBox').onclick = async () => {
     // [수정] 선물이 없으면 안내만 하지 않고 개발자에게 알릴 수 있는 화면으로 이동
     if(!(row && row.image_path)){
       showReport('no_gift', '개발자가 선물 안넣음',
-        found.name + '원하는거 있으면 적어서 보내셈',
+        '원하는거 있으면 적어서 보내셈',
         '[선물 없음] ' + found.name + '님');
       return;
     }
