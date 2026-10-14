@@ -1,0 +1,18 @@
+name: Supabase keep-alive
+
+on:
+  schedule:
+    - cron: '0 3 */3 * *'   # 3일마다 (UTC 03:00 = 한국 시간 낮 12:00)
+  workflow_dispatch:         # Actions 탭에서 수동 실행도 가능
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Supabase에 가벼운 DB 조회 보내기
+        run: |
+          # 사이트가 쓰는 조회 함수를 1월 1일 기준으로 호출 (데이터 변경 없음)
+          curl -fsS -X POST "https://ctocmfwapqmcbxvrpizf.supabase.co/rest/v1/rpc/get_candidates" \
+            -H "apikey: sb_publishable_Jpi0up33lTITVVwPCwlurg_J-lssKvQ" \
+            -H "Content-Type: application/json" \
+            -d '{"p_month":1,"p_day":1}'
