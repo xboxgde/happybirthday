@@ -7,7 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <!-- [수정] <style> 블록 삭제 → style.css 파일로 분리 -->
-<link rel="stylesheet" href="style.css">
+<!-- [수정] ?v=3 추가: 브라우저가 예전 style.css를 재사용하지 않도록 (파일 수정 때마다 숫자를 올리면 됨) -->
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -138,6 +139,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.js"></script>
 <!-- [수정] 인라인 <script> 블록 삭제 → app.js 파일로 분리 -->
-<script src="app.js"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>
