@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>생일 선물 상자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
+<!-- [수정] <style> 블록 삭제 → style.css 파일로 분리 -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <b>🎂 생일 선물 상자</b>
+  <!-- 요구사항 1.1: 오른쪽 상단 개발자 화면 접속 버튼 -->
+  <button class="btn sub" id="btnDev">개발자</button>
+</header>
+
+<main>
+
+  <!-- [1] 첫 화면: 생일인지 아닌지 선택 -->
+  <section class="view on" id="v-home">
+    <h1>오늘, 생일이세요?</h1>
+    <p>생일이라면 준비된 선물이 기다리고 있어요.</p>
+    <div class="row">
+      <button class="btn" id="btnYes">네, 생일이에요</button>
+      <button class="btn mint" id="btnNo">아니요</button>
+    </div>
+  </section>
+
+  <!-- [2] 생일 입력 화면 -->
+  <section class="view" id="v-input">
+    <h2>생일을 알려주세요</h2>
+    <div class="panel">
+      <label>월 / 일</label>
+      <div class="inline">
+        <select id="selMonth" aria-label="월"></select>
+        <select id="selDay" aria-label="일"></select>
+      </div>
+      <p class="msg" id="inputMsg" role="alert"></p>
+      <div class="row"><button class="btn" id="btnCheck">선물 확인하기</button>
+      <button class="btn sub" data-go="home">처음으로</button></div>
+    </div>
+  </section>
+
+  <!-- [3] 생일이 아닐 때 화면 -->
+  <section class="view" id="v-notbday">
+    <h1>생일이 아니군요!</h1>
+    <p>생일이 되면 다시 놀러 와 주세요.</p>
+    <div class="row"><button class="btn" data-go="home">처음으로</button></div>
+  </section>
+
+  <!-- [수정] 동일 생일자가 2명 이상일 때 본인을 고르는 화면 추가 -->
+  <section class="view" id="v-pick">
+    <h2>같은 생일인 분이 여러 명이에요</h2>
+    <p>본인 이름을 눌러주세요.</p>
+    <div class="pickList" id="pickList"></div>
+    <div class="row"><button class="btn sub" data-go="input">다시 입력</button></div>
+  </section>
+
+  <!-- [4] 선물상자 화면 -->
+  <section class="view" id="v-box">
+    <h2 id="boxTitle"></h2>
+    <p>선물상자를 눌러보세요.</p>
+    <button class="box" id="giftBox" aria-label="선물상자 열기">
+      <span class="body"></span><span class="rib"></span><span class="lid"></span>
+    </button>
+  </section>
+
+  <!-- [5] 선물 확인 화면 -->
+  <section class="view" id="v-gift">
+    <h2 id="giftTitle"></h2>
+    <img class="gift" id="giftImg" alt="생일 선물">
+    <div class="row"><button class="btn" data-go="home">처음으로</button></div>
+  </section>
+
+  <!-- [6] 개발자 로그인 -->
+  <section class="view" id="v-login">
+    <h2>개발자 로그인</h2>
+    <div class="panel">
+      <label for="loginId">이메일</label>
+      <input id="loginId" type="email" autocomplete="username">
+      <label for="loginPw">비밀번호</label>
+      <input id="loginPw" type="password" autocomplete="current-password">
+      <p class="msg" id="loginMsg" role="alert"></p>
+      <div class="row"><button class="btn" id="btnLogin">로그인</button>
+      <button class="btn sub" data-go="home">돌아가기</button></div>
+    </div>
+  </section>
+
+  <!-- [7] 개발자: 생일자 등록/관리 -->
+  <section class="view" id="v-admin">
+    <h2>생일자 등록</h2>
+    <div class="panel">
+      <label for="admName">이름</label>
+      <input id="admName">
+      <label>생일 (월 / 일)</label>
+      <div class="inline">
+        <select id="admMonth" aria-label="월"></select>
+        <select id="admDay" aria-label="일"></select>
+      </div>
+      <!-- [수정] 선물 이미지 입력란 삭제 → 선물 관리 화면으로 분리 -->
+      <p class="msg" id="admMsg" role="alert"></p>
+      <div class="row"><button class="btn" id="btnSave">등록하기</button>
+      <button class="btn mint" id="btnToGifts">선물 이미지 관리</button>
+      <button class="btn sub" id="btnLogout">로그아웃</button></div>
+    </div>
+    <h2>등록된 생일자</h2>
+    <div class="panel" id="list"></div>
+  </section>
+
+  <!-- [수정] 개발자: 선물 이미지 관리 화면 (신규, 생일자 관리와 분리) -->
+  <section class="view" id="v-giftadm">
+    <h2>선물 이미지 관리</h2>
+    <div class="panel">
+      <label for="giftPerson">생일자 선택</label>
+      <select id="giftPerson"></select>
+      <label for="giftFile">선물 이미지</label>
+      <input id="giftFile" type="file" accept="image/*">
+      <p class="msg" id="giftMsg" role="alert"></p>
+      <div class="row"><button class="btn" id="btnGiftSave">이미지 저장</button>
+      <button class="btn sub" id="btnToPeople">생일자 관리로</button></div>
+    </div>
+    <h2>선물 등록 현황</h2>
+    <div class="panel" id="giftList"></div>
+  </section>
+
+  <!-- [수정] 사용자: 본인 확인 화면 (신규, 생일 입력 후 / 선물상자 전) -->
+  <section class="view" id="v-confirm">
+    <h2 id="confirmTitle"></h2>
+    <p>본인이 맞으면 "맞아요"를 눌러주세요.</p>
+    <div class="row"><button class="btn" id="btnConfirmYes">맞아요</button>
+    <button class="btn sub" id="btnConfirmNo">아니에요</button></div>
+  </section>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.js"></script>
+<!-- [수정] 인라인 <script> 블록 삭제 → app.js 파일로 분리 -->
+<script src="app.js"></script>
+</body>
+</html>

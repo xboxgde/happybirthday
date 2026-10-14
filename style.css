@@ -1,0 +1,60 @@
+/* 생일 선물 상자 - 디자인 파일 (index.html에서 불러옴) */
+/* ===== 디자인 토큰: 색상은 :root 변수로 관리 (라이트/다크 대응) ===== */
+:root{
+  --bg:#fff7ea; --ink:#2a2350; --card:#ffffff; --pink:#ff4f8b; --sun:#ffc93c; --mint:#27c9a0; --line:#e6dcc8;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){ --bg:#1d1a3f; --ink:#fff4dc; --card:#2b2760; --line:#443f87; }
+}
+:root[data-theme="dark"]{ --bg:#1d1a3f; --ink:#fff4dc; --card:#2b2760; --line:#443f87; }
+
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+     font-family:'Jua','Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:18px;line-height:1.5}
+
+/* 상단 바: 오른쪽 상단에 개발자 버튼 배치 (요구사항 1.1) */
+header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px}
+header b{font-size:20px}
+.btn{font-family:inherit;font-size:18px;border:0;border-radius:14px;padding:12px 22px;cursor:pointer;
+     background:var(--pink);color:#fff}
+.btn.sub{background:transparent;color:var(--ink);border:2px solid var(--line);padding:8px 14px;font-size:15px}
+.btn.mint{background:var(--mint);color:#10352c}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sun);outline-offset:2px}
+
+/* 화면(뷰) 공통: .on 클래스가 붙은 화면만 보여줌 */
+main{max-width:560px;margin:0 auto;padding:12px 20px 60px}
+.view{display:none;text-align:center}
+.view.on{display:block}
+h1{font-size:34px;margin:28px 0 10px}
+h2{font-size:26px;margin:20px 0 10px}
+.row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:22px}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:20px;text-align:left}
+label{display:block;margin:12px 0 4px;font-size:16px}
+input,select{font-family:inherit;font-size:18px;width:100%;padding:10px 12px;border-radius:10px;
+     border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+.inline{display:flex;gap:10px}
+.msg{min-height:26px;color:var(--pink);margin-top:10px}
+
+/* 선물상자: 이 페이지에서 가장 눈에 띄는 요소 (CSS로 그림) */
+.box{width:180px;height:180px;margin:30px auto 10px;position:relative;cursor:pointer;border:0;background:none;padding:0;
+     animation:bob 1.6s ease-in-out infinite}
+.box .body{position:absolute;left:10px;right:10px;bottom:0;height:115px;background:var(--pink);border-radius:8px}
+.box .lid{position:absolute;left:0;right:0;top:35px;height:42px;background:var(--sun);border-radius:8px;transition:transform .5s}
+.box .rib{position:absolute;left:50%;width:26px;margin-left:-13px;top:35px;bottom:0;background:var(--mint)}
+.box.open{animation:none}
+.box.open .lid{transform:translate(40px,-60px) rotate(25deg)}
+@keyframes bob{50%{transform:translateY(-10px)}}
+@media (prefers-reduced-motion:reduce){ .box{animation:none} .box .lid{transition:none} }
+
+.gift{max-width:100%;max-height:60vh;border-radius:16px;border:4px solid var(--sun)}
+
+/* [수정] 동일 생일자 선택 버튼 스타일 추가 */
+.pickList{display:flex;flex-direction:column;gap:12px;margin-top:22px}
+.btn.pick{background:var(--card);color:var(--ink);border:2px solid var(--pink);font-size:22px;padding:16px}
+
+/* 개발자 목록 */
+.item{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.item img{width:48px;height:48px;object-fit:cover;border-radius:8px}
+.item span{flex:1}
