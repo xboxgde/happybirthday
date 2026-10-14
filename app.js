@@ -50,7 +50,7 @@ function goConfirm(person){
 }
 // [수정] 선물상자 화면 열기를 함수로 분리 (질문이 끝난 뒤에도 호출하기 위함)
 function openBox(){
-  $('boxTitle').textContent = found.name + ' 생축생축 짝짝짝';
+  $('boxTitle').textContent = '생축생축 짝짝짝';
   $('giftBox').classList.remove('open');
   show('box');
 }
@@ -108,7 +108,7 @@ $('giftBox').onclick = async () => {
     if(res.error) throw res.error;
     const row = res.data && res.data[0];
 
-    $('giftTitle').textContent = found.name + ' 너만을 위한 선물~';
+    $('giftTitle').textContent = ' 너만을 위한 선물~';
     // [수정] 선물이 없으면 안내만 하지 않고 개발자에게 알릴 수 있는 화면으로 이동
     if(!(row && row.image_path)){
       showReport('no_gift', '개발자가 선물 안넣음',
