@@ -73,7 +73,7 @@ $('btnCheck').onclick = async () => {
     if(!data.length){
       const m = $('selMonth').value, d = $('selDay').value;
       showReport('no_birthday', '개발자가 너 등록 안한듯',
-        m + '월 ' + d + '생일 입력하면 개발자한테 알려드림',
+       '생일 입력하면 개발자한테 알려드림',
         '[생일 없음] ' + m + '월 ' + d + '일 입력');
       return;
     }
