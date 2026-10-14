@@ -87,6 +87,26 @@
     </div>
   </section>
 
+  <!-- [추가] 사용자: 개발자에게 알리기 화면 ("생일 없음" / "선물 없음" 공통) -->
+  <section class="view" id="v-report">
+    <h2 id="rpTitle"></h2>
+    <p id="rpSub"></p>
+    <div class="panel">
+      <label for="rpNote">남길 말 (선택)</label>
+      <input id="rpNote" maxlength="100">
+      <p class="msg" id="rpMsg" role="alert"></p>
+      <div class="row"><button class="btn" id="btnRpSend">개발자에게 알리기</button>
+      <button class="btn sub" data-go="home">처음으로</button></div>
+    </div>
+  </section>
+
+  <!-- [추가] 개발자: 받은 메시지 화면 -->
+  <section class="view" id="v-inbox">
+    <h2>받은 메시지</h2>
+    <div class="panel" id="inboxList"></div>
+    <div class="row"><button class="btn sub" id="btnInboxBack">생일자 관리로</button></div>
+  </section>
+
   <!-- [6] 개발자 로그인 -->
   <section class="view" id="v-login">
     <h2>개발자 로그인</h2>
@@ -116,6 +136,7 @@
       <p class="msg" id="admMsg" role="alert"></p>
       <div class="row"><button class="btn" id="btnSave">등록하기</button>
       <button class="btn mint" id="btnToGifts">선물 이미지 관리</button>
+      <button class="btn mint" id="btnToInbox">받은 메시지</button>   <!-- [추가] -->
       <button class="btn sub" id="btnLogout">로그아웃</button></div>
     </div>
     <h2>등록된 생일자</h2>
@@ -161,6 +182,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.js"></script>
 <!-- [수정] 인라인 <script> 블록 삭제 → app.js 파일로 분리 -->
-<script src="app.js?v=6"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

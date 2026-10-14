@@ -17,7 +17,8 @@ const $ = id => document.getElementById(id);
 function show(name){
   document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
   $('v-'+name).classList.add('on');
-  if(name === 'notbday') loadNotBdayImage();   // [수정] 생일 아님 화면이 열리면 사진 불러오기
+  if(name === 'notbday') loadNotBdayImage();
+  if(name === 'admin') updateInboxCount();      // [추가] 받은 메시지 개수 표시 갱신   // [수정] 생일 아님 화면이 열리면 사진 불러오기
 }
 document.querySelectorAll('[data-go]').forEach(b => b.onclick = () => show(b.dataset.go));
 
@@ -68,9 +69,12 @@ $('btnCheck').onclick = async () => {
     if(error) throw error;
 
     // 일치하는 사람이 없으면 안내 후 첫 화면
+    // [수정] 안내 후 자동 복귀 → 개발자에게 알릴 수 있는 화면으로 이동 (처음으로 돌아가는 버튼 포함)
     if(!data.length){
-      $('inputMsg').textContent = '등록된 생일이 없어 처음 화면으로 돌아갑니다.';
-      setTimeout(() => show('home'), 1500);
+      const m = $('selMonth').value, d = $('selDay').value;
+      showReport('no_birthday', '등록된 생일이 없어요',
+        m + '월 ' + d + '일 생일이 등록되어 있지 않아요. 개발자에게 알려드릴까요?',
+        '[생일 없음] ' + m + '월 ' + d + '일 입력');
       return;
     }
     candidates = data;
@@ -105,13 +109,15 @@ $('giftBox').onclick = async () => {
     const row = res.data && res.data[0];
 
     $('giftTitle').textContent = found.name + '님을 위한 선물';
-    if(row && row.image_path){
-      $('giftImg').src = imgUrl(row.image_path);
-      $('giftImg').style.display = '';
-    }else{                                          // 선물 이미지 미등록
-      $('giftTitle').textContent = '선물이 아직 준비되지 않았어요';
-      $('giftImg').style.display = 'none';
+    // [수정] 선물이 없으면 안내만 하지 않고 개발자에게 알릴 수 있는 화면으로 이동
+    if(!(row && row.image_path)){
+      showReport('no_gift', '선물이 아직 준비되지 않았어요',
+        found.name + '님의 선물이 아직 없어요. 개발자에게 알려드릴까요?',
+        '[선물 없음] ' + found.name + '님');
+      return;
     }
+    $('giftImg').src = imgUrl(row.image_path);
+    $('giftImg').style.display = '';
     show('gift');
   }catch(e){
     $('giftBox').classList.remove('open');
@@ -400,3 +406,63 @@ $('btnNbDel').onclick = async () => {
   $('nbMsg').textContent = '삭제했습니다.';
   renderNb();
 };
+
+/* ============================================================
+   [추가] 개발자에게 알리기 (사용자 → 개발자)
+   - 전송은 서버 함수 send_dev_message만 사용 (테이블에 직접 쓰기는 불가)
+   - 사용자가 버튼을 눌렀을 때만 전송 (자동 전송 X)
+   ============================================================ */
+let report = null;   // 지금 보내려는 내용 { kind, summary }
+
+function showReport(kind, title, sub, summary){
+  report = { kind, summary };
+  $('rpTitle').textContent = title;
+  $('rpSub').textContent = sub;
+  $('rpNote').value = '';
+  $('rpMsg').textContent = '';
+  $('btnRpSend').disabled = false;
+  show('report');
+}
+
+$('btnRpSend').onclick = async () => {
+  const btn = $('btnRpSend'); btn.disabled = true;          // 중복 전송 방지
+  const note = $('rpNote').value.trim();
+  const body = report.summary + (note ? ' / 메모: ' + note : '');
+  try{
+    const { error } = await sb.rpc('send_dev_message', { p_kind: report.kind, p_body: body });
+    if(error) throw error;
+    $('rpMsg').textContent = '개발자에게 전달했어요. 고마워요!';   // 성공 후 버튼은 잠근 채로 둠
+  }catch(e){
+    $('rpMsg').textContent = '전달하지 못했어요. 잠시 후 다시 시도해 주세요.';
+    btn.disabled = false;
+  }
+};
+
+/* ============================================================
+   [추가] 개발자: 받은 메시지 확인 / 삭제
+   ============================================================ */
+// 관리자 화면의 버튼에 메시지 개수 표시 (오류면 기본 문구 유지)
+async function updateInboxCount(){
+  const { count, error } = await sb.from('dev_messages').select('id', { count: 'exact', head: true });
+  if(!error && count !== null) $('btnToInbox').textContent = '받은 메시지 (' + count + ')';
+}
+
+async function renderInbox(){
+  const box = $('inboxList'); box.textContent = '';
+  const { data, error } = await sb.from('dev_messages')
+    .select('id,body,created_at').order('created_at', { ascending: false });
+  if(error){ box.textContent = '불러오지 못했습니다. 다시 로그인해 보세요.'; return; }
+  if(!data.length){ box.textContent = '받은 메시지가 없습니다.'; return; }
+  data.forEach(m => {
+    const row = document.createElement('div'); row.className = 'item';
+    const sp = document.createElement('span');
+    sp.textContent = new Date(m.created_at).toLocaleString('ko-KR') + ' · ' + m.body;
+    const bt = document.createElement('button'); bt.className = 'btn sub'; bt.textContent = '삭제';
+    bt.onclick = async () => { await sb.from('dev_messages').delete().eq('id', m.id); renderInbox(); };
+    row.append(sp, bt);
+    box.append(row);
+  });
+}
+
+$('btnToInbox').onclick   = () => { renderInbox(); show('inbox'); };
+$('btnInboxBack').onclick = () => { renderList(); show('admin'); };
