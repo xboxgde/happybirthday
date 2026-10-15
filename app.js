@@ -121,7 +121,7 @@ $('giftBox').onclick = async () => {
     show('gift');
   }catch(e){
     $('giftBox').classList.remove('open');
-    alert('오류남. 다시해라');
+    alert('선물을 불러오지 못했어요. 다시 눌러주세요.');
   }
 };
 
@@ -166,8 +166,11 @@ $('btnSave').onclick = async () => {
   const name = $('admName').value.trim();
   if(!name){ $('admMsg').textContent = '이름을 입력하세요.'; return; }
   const btn = $('btnSave'); btn.disabled = true;
-  const { error } = await sb.from('people')
-    .insert({ name, month: +$('admMonth').value, day: +$('admDay').value });
+  // [수정] 수정 중이면 update, 아니면 기존처럼 insert
+  const row = { name, month: +$('admMonth').value, day: +$('admDay').value };
+  const { error } = editingId
+    ? await sb.from('people').update(row).eq('id', editingId)
+    : await sb.from('people').insert(row);
   btn.disabled = false;
   if(error){
     // 23505: 중복(unique), 23514: check 제약 위반(없는 날짜)
@@ -176,8 +179,9 @@ $('btnSave').onclick = async () => {
                             : '등록에 실패했습니다.';
     return;
   }
-  $('admMsg').textContent = '등록했습니다. 선물 이미지는 "선물 이미지 관리"에서 추가하세요.';
-  $('admName').value = '';
+  // [수정] 수정/등록에 따라 안내 문구를 나누고, 수정 모드를 해제
+  $('admMsg').textContent = editingId ? '수정했습니다.' : '등록했습니다. 선물 이미지는 "선물 이미지 관리"에서 추가하세요.';
+  exitEdit();
   renderList();
 };
 
@@ -187,6 +191,7 @@ $('btnToPeople').onclick = () => { renderList(); show('admin'); };
 // 생일자 삭제: 이미지 파일 먼저 삭제 → 행 삭제 (gifts 행은 DB가 자동 삭제)
 async function deletePerson(p){
   if(!confirm(p.name + '님을 삭제할까요?')) return;
+  if(editingId === p.id) exitEdit();   // [추가] 수정 중이던 사람을 삭제하면 수정 모드 해제
   if(p.path) await sb.storage.from(BUCKET).remove([p.path]);
   const { error } = await sb.from('people').delete().eq('id', p.id);
   if(error) $('admMsg').textContent = '삭제에 실패했습니다.';
@@ -204,7 +209,10 @@ async function renderList(){
       sp.textContent = p.name + ' · ' + p.month + '월 ' + p.day + '일' + (p.path ? ' · 선물 있음' : ' · 선물 없음');
       const bt = document.createElement('button'); bt.className = 'btn sub'; bt.textContent = '삭제';
       bt.onclick = () => deletePerson(p);
-      row.append(sp, bt);
+      // [추가] 수정 버튼: 누르면 입력칸에 현재 값을 채우고 수정 모드로 전환
+      const eb = document.createElement('button'); eb.className = 'btn sub'; eb.textContent = '수정';
+      eb.onclick = () => startEdit(p);
+      row.append(sp, eb, bt);
       box.append(row);
     });
   }catch(e){
@@ -466,3 +474,34 @@ async function renderInbox(){
 
 $('btnToInbox').onclick   = () => { renderInbox(); show('inbox'); };
 $('btnInboxBack').onclick = () => { renderList(); show('admin'); };
+
+/* ============================================================
+   [추가] 생일자 수정
+   - 목록의 "수정" 버튼 → 등록 입력칸에 현재 값 채움 → "수정 저장"으로 update
+   - 선물 이미지는 person_id로 연결되어 있어 이름/생일을 고쳐도 그대로 유지됨
+   ============================================================ */
+let editingId = null;   // 수정 중인 생일자 id (null이면 일반 등록 모드)
+
+function startEdit(p){
+  editingId = p.id;
+  $('admName').value  = p.name;
+  $('admMonth').value = p.month;
+  $('admDay').value   = p.day;
+  $('admTitle').textContent = '생일자 수정';
+  $('btnSave').textContent  = '수정 저장';
+  $('btnCancelEdit').style.display = '';
+  $('admMsg').textContent = '';
+  $('admName').focus();
+  window.scrollTo({ top: 0, behavior: 'smooth' });   // 목록에서 눌렀을 때 입력칸이 보이도록
+}
+
+// 수정 모드 해제: 등록 화면 상태로 되돌림
+function exitEdit(){
+  editingId = null;
+  $('admName').value = '';
+  $('admTitle').textContent = '생일자 등록';
+  $('btnSave').textContent  = '등록하기';
+  $('btnCancelEdit').style.display = 'none';
+}
+
+$('btnCancelEdit').onclick = () => { exitEdit(); $('admMsg').textContent = ''; };

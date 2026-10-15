@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 <!-- [수정] <style> 블록 삭제 → style.css 파일로 분리 -->
 <!-- [수정] ?v=3 추가: 브라우저가 예전 style.css를 재사용하지 않도록 (파일 수정 때마다 숫자를 올리면 됨) -->
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -29,6 +29,7 @@
     </div>
   </section>
 
+
   <!-- [2] 생일 입력 화면 -->
   <section class="view" id="v-input">
     <h2>생일이 언제인뎁숑</h2>
@@ -44,7 +45,7 @@
     </div>
   </section>
 
-  <!-- [3] 생일이 아닐 때 화면 -->
+<!-- [3] 생일이 아닐 때 화면 -->
   <section class="view" id="v-notbday">
     <h1>생일이 아니잖아.</h1>
     <p>생일이 되면 다시와라.</p>
@@ -123,7 +124,7 @@
 
   <!-- [7] 개발자: 생일자 등록/관리 -->
   <section class="view" id="v-admin">
-    <h2>생일자 등록</h2>
+    <h2 id="admTitle">생일자 등록</h2>   <!-- [수정] 수정 모드에서 제목을 바꾸기 위해 id 추가 -->
     <div class="panel">
       <label for="admName">이름</label>
       <input id="admName">
@@ -135,6 +136,7 @@
       <!-- [수정] 선물 이미지 입력란 삭제 → 선물 관리 화면으로 분리 -->
       <p class="msg" id="admMsg" role="alert"></p>
       <div class="row"><button class="btn" id="btnSave">등록하기</button>
+      <button class="btn sub" id="btnCancelEdit" style="display:none">수정 취소</button>   <!-- [추가] 수정 모드에서만 표시 -->
       <button class="btn mint" id="btnToGifts">선물 이미지 관리</button>
       <button class="btn mint" id="btnToInbox">받은 메시지</button>   <!-- [추가] -->
       <button class="btn sub" id="btnLogout">로그아웃</button></div>
@@ -182,6 +184,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.50.0/dist/umd/supabase.js"></script>
 <!-- [수정] 인라인 <script> 블록 삭제 → app.js 파일로 분리 -->
-<script src="app.js?v=7"></script>
+<script src="app.js?v=9"></script>
 </body>
 </html>
